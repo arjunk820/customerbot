@@ -1,18 +1,27 @@
-import {NextResponse} from 'next/server' // Import NextResponse from Next.js for handling responses
-import OpenAI from 'openai' // Import OpenAI library for interacting with the OpenAI API
+import {NextResponse} from 'next/server'
+import OpenAI from 'openai';
+import dotenv from 'dotenv';
 
-// System prompt for the AI, providing guidelines on how to respond to users
-const systemPrompt = "You are a compassionate and insightful assistant, skilled in answering personal questions with empathy and clarity. Provide thoughtful, supportive, and tailored responses that prioritize the user's emotional well-being, balancing information with sensitivity."// Use your own system prompt here
+dotenv.config({ path: '../../../.env.local'});
 
-// POST function to handle incoming requests
+const systemPrompt = "You are a compassionate and sensitive therapist capable of easily providing guidance to users' personal troubles and questions. Keep your answers to no more than 50 words."
+
 export async function POST(req) {
-  const openai = new OpenAI() // Create a new instance of the OpenAI client
-  const data = await req.json() // Parse the JSON body of the incoming request
+  const data = await req.json();
 
-  // Create a chat completion request to the OpenAI API
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+  
   const completion = await openai.chat.completions.create({
-    messages: [{role: 'system', content: systemPrompt}, ...data], // Include the system prompt and user messages
-    model: 'gpt-4o', // Specify the model to use
+    messages: [
+      {
+        role: 'system',
+        content: systemPrompt,
+      },
+      ...data,
+    ],
+    model: 'gpt-4o-mini', // Specify the model to use
     stream: true, // Enable streaming responses
   })
 

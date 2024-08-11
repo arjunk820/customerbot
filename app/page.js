@@ -7,7 +7,7 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Hi! I'm Arjun's AI assistant. How can I help you today?",
+      content: "Hi! I'm Arjun's AI therapist. How can I help you today?",
     },
   ])
   const [message, setMessage] = useState('')
@@ -16,6 +16,7 @@ export default function Home() {
   const sendMessage = async () => {
     if (!message.trim()) return;  // Don't send empty messages
   
+    setIsLoading(true)
     setMessage('')
     setMessages((messages) => [
       ...messages,
@@ -33,7 +34,7 @@ export default function Home() {
       })
   
       if (!response.ok) {
-        throw new Error('Network response was not ok')
+        throw new Error('Network response was not ok');
       }
   
       const reader = response.body.getReader()
@@ -59,8 +60,10 @@ export default function Home() {
         { role: 'assistant', content: "I'm sorry, but I encountered an error. Please try again later." },
       ])
     }
+    setIsLoading(false)
   }
 
+  // Press enter button
   const handleKeyPress = (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault()
@@ -68,6 +71,7 @@ export default function Home() {
     }
   }
 
+  // Enable auto-scrolling
   const messagesEndRef = useRef(null)
 
   const scrollToBottom = () => {
@@ -133,9 +137,15 @@ export default function Home() {
             fullWidth
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            disabled={isLoading}
           />
-          <Button variant="contained" onClick={sendMessage}>
-            Send
+          <Button 
+            variant="contained" 
+            onClick={sendMessage}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Sending...' : 'Send'}
           </Button>
         </Stack>
       </Stack>
